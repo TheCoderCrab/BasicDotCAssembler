@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/media/Dedomena/Projects/dev/C++/BasicDotCAssembler/plateforms/flat/src/flat.cpp
+bdc_assembler/module.hpp
+-
+bdc_assembler/core/parser.hpp
+-
+bdc_assembler/utils/log.hpp
+-
+vector
+-
+
+/media/Dedomena/Projects/dev/C++/BasicDotCAssembler/plateforms/include/bdc_assembler/core/parser.hpp
+string
+-
+vector
+-
+
+/media/Dedomena/Projects/dev/C++/BasicDotCAssembler/plateforms/include/bdc_assembler/module.hpp
+
+/media/Dedomena/Projects/dev/C++/BasicDotCAssembler/plateforms/include/bdc_assembler/utils/log.hpp
+iostream
+-
+

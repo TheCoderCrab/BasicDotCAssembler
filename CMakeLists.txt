@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12.4)
 
-add_compile_definitions(BASIC_DOTC_ASSEMBLER)
+add_compile_definitions(basic_dotc_assembler)
 
 file(GLOB_RECURSE SRC_FILES "assembler/src/*.cpp")
 

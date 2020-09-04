@@ -1,0 +1,3 @@
+/media/Dedomena/Projects/dev/C++/BasicDotCAssembler/build/plateforms/flat/CMakeFiles/rebuild_cache.dir
+/media/Dedomena/Projects/dev/C++/BasicDotCAssembler/build/plateforms/flat/CMakeFiles/edit_cache.dir
+/media/Dedomena/Projects/dev/C++/BasicDotCAssembler/build/plateforms/flat/CMakeFiles/flat.dir
