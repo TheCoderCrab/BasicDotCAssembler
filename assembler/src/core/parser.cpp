@@ -24,7 +24,7 @@ static int string_to_int(const std::string& s, uint line_num)
     {
         try
         {
-            return std::stoi(s.substr(2), nullptr, 16);
+            return std::stol(s.substr(2), nullptr, 16);
         }
         catch(const std::exception& e)
         {
@@ -37,7 +37,7 @@ static int string_to_int(const std::string& s, uint line_num)
     {
         try
         {
-            return std::stoi(s.substr(2), nullptr, 2);
+            return std::stol(s.substr(2), nullptr, 2);
         }
         catch(const std::exception& e)
         {
@@ -50,7 +50,7 @@ static int string_to_int(const std::string& s, uint line_num)
     {
         try
         {
-            return std::stoi(s.substr(2), nullptr, 8);
+            return std::stol(s.substr(2), nullptr, 8);
         }
         catch(const std::exception& e)
         {
@@ -63,7 +63,7 @@ static int string_to_int(const std::string& s, uint line_num)
     {
         try
         {
-            return std::stoi(s);
+            return std::stol(s);
         }
         catch(const std::exception& e)
         {
@@ -202,7 +202,7 @@ std::vector<line_data> parse_file(const std::string& file)
                     c = ' ';
             line_only_space.erase(std::unique(line_only_space.begin(), line_only_space.end(),
                                   both_space), line_only_space.end());
-            if(line_only_space.find(' ') == std::string::npos)
+            if(line_only_space.find(' ') == std::string::npos) // no space found
                 line_d.instruction = line_only_space;
             else
             {
@@ -249,7 +249,6 @@ std::vector<line_data> parse_file(const std::string& file)
                         exit(EXIT_FAILURE);
                     }
                 }
-                adr += 2; // Instruction and arg descriptor
                 if(line_d.args[0].activated)
                 {
                     auto get_arg_size = [&] (arg& a)
@@ -299,6 +298,7 @@ std::vector<line_data> parse_file(const std::string& file)
                         }
                         else if(MATCH(s_mem_access))
                         {
+                            a.mem = true;
                             a.size = get_prefix_size(a.prefix);
                             return 0;
                         }
@@ -317,7 +317,9 @@ std::vector<line_data> parse_file(const std::string& file)
                     adr += get_arg_size(line_d.args[0]) + get_arg_size(line_d.args[1]);
                 }
             }
+            adr += 2;
         }
+        DEBUG_M("Instruction: " << line_d.instruction << ", at: " << adr -2);
         lines_data.push_back(line_d);
     }
     DEBUG_M("Replacing labels");
@@ -345,25 +347,17 @@ std::vector<line_data> parse_file(const std::string& file)
         DEBUG_M("Replacing instructions");
         std::transform(l.instruction.begin(), l.instruction.end(), l.instruction.begin(), ::toupper);
 #define ERR(n) { ERR_M("Instruction: " << l.instruction << " can only have " << n << " argument"); exit(EXIT_FAILURE); } do{}while(0)
+#define ADD0(s) else if(l.instruction == #s) { if(l.args[0].activated  ||  l.args[1].activated)ERR(0); l.instr = instruction_n::s; } // To add a generic instruction taking 0 arguments
+#define ADD1(s) else if(l.instruction == #s) { if(!l.args[0].activated ||  l.args[1].activated)ERR(0); l.instr = instruction_n::s; } // To add a generic instruction taking 1 arguments
+#define ADD2(s) else if(l.instruction == #s) { if(!l.args[0].activated || !l.args[1].activated)ERR(0); l.instr = instruction_n::s; } // To add a generic instruction taking 2 arguments
         if(l.instruction == "NO_OP")
         {
             if(l.args[0].activated || l.args[1].activated)
                 ERR(0);
             l.instr = instruction_n::NO_OP;
         }
-        else if(l.instruction == "CPUINF")
-        {
-            if(!l.args[0].activated || l.args[1].activated)
-                ERR(1);
-            l.instr = instruction_n::CPUINF;
-        }
-        else if(l.instruction == "SET")
-        {
-            if(!l.args[0].activated || !l.args[1].activated)
-                ERR(2);
-            DEBUG_M("A valid SET instruction");
-            l.instr = instruction_n::SET;
-        }
+        ADD0(CPUINF)
+        ADD2(SET)
         else if(l.instruction == "PUSH")
         {
             if(!l.args[0].activated || l.args[1].activated)
@@ -375,6 +369,9 @@ std::vector<line_data> parse_file(const std::string& file)
             else if(l.args[0].size == 1)
                 l.instr = instruction_n::PUSH1;
         }
+        ADD1(PUSH4)
+        ADD1(PUSH2)
+        ADD1(PUSH1)
         else if(l.instruction == "POP")
         {
             if(!l.args[0].activated || l.args[1].activated)
@@ -386,18 +383,73 @@ std::vector<line_data> parse_file(const std::string& file)
             else if(l.args[0].size == 1)
                 l.instr = instruction_n::POP1;
         }
-        else if(l.instruction == "HLT")
+        ADD1(POP4)
+        ADD1(POP2)
+        ADD1(POP1)
+        ADD1(LGDTR)
+        ADD1(SGDTR)
+        ADD1(LDS)
+        ADD1(LCS)
+        ADD1(LSS)
+        ADD1(SDS)
+        ADD1(SCS)
+        ADD1(SSS)
+        ADD1(LIHP)
+        ADD1(SIHP)
+        ADD1(INT)
+        ADD0(IRET)
+        ADD2(NOT)
+        ADD2(OR)
+        ADD2(AND)
+        ADD2(XOR)
+        ADD2(NOR)
+        ADD2(NAND)
+        ADD2(XNOR)
+        ADD2(ADD)
+        ADD2(FADD)
+        ADD2(SUB)
+        ADD2(FSUB)
+        ADD2(MUL)
+        ADD2(FMUL)
+        ADD2(DIV)
+        ADD2(FDIV)
+        ADD2(SL)
+        ADD2(SR)
+        ADD2(INTG)
+        ADD2(FLOAT)
+        ADD1(JMP)
+        ADD1(CALL)
+        ADD2(CMP)
+        ADD2(FCMP)
+        ADD2(UCMP)
+        ADD1(JE)
+        ADD1(JZ)
+        ADD1(JG)
+        ADD1(JEG)
+        ADD1(JEL)
+        ADD0(RET)
+        ADD0(HLT)
+        ADD1(SLEEPS)
+        ADD1(SLEEPMS)
+        else if(l.instruction == "SLEEP")
         {
-            if(l.args[0].activated || l.args[1].activated)
+            if(!l.args[0].activated ||  l.args[1].activated)
                 ERR(0);
-            DEBUG_M("A valid HLT instruction");
-            l.instr = instruction_n::HLT;
+            l.instr = instruction_n::SLEEPMS;
         }
+        ADD1(SLEEPMCS)
+        ADD1(LCPL)
+        ADD1(SCPL)
+        ADD2(IN)
+        ADD2(OUT)
         else
         {
             ERR_M("Unknown instruction: " << l.instruction << " at line " << l.line_num);
             exit(EXIT_FAILURE);
         }
+#undef ADD2
+#undef ADD1
+#undef ADD0
         auto get_arg_type = [&] (arg& a)
         {
             if(!a.activated)

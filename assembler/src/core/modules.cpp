@@ -2,10 +2,17 @@
 #include <bdc_assembler/utils/log.hpp>
 #include <bdc_assembler/utils/config.hpp>
 #include <bdc_assembler/core/parser.hpp>
+#include <bdc_assembler/utils/utils.hpp>
 #include <filesystem>
 #include <dlfcn.h>
 
+
 static std::vector<module> s_modules;
+
+static std::string get_modules_dir()
+{
+    return utils::get_workdir() + "modules/";
+}
 
 static void remove_modules(std::vector<module*>& modules_to_remove)
 {
@@ -23,9 +30,9 @@ static void remove_modules(std::vector<module*>& modules_to_remove)
 void load_modules()
 {
     uint uid_count = 0;
-    if(!std::filesystem::exists(MODULES_DIR))
-        std::filesystem::create_directory(MODULES_DIR);
-    for(auto& entry : std::filesystem::directory_iterator(MODULES_DIR))
+    if(!std::filesystem::exists(get_modules_dir()))
+        std::filesystem::create_directory(get_modules_dir());
+    for(auto& entry : std::filesystem::directory_iterator(get_modules_dir()))
         if(entry.is_directory() && std::filesystem::exists(entry.path().string().append("/plateform.pcf")))
         {
             s_modules.push_back(module{.uid = uid_count, .config = read_config_file(entry.path().string().append("/plateform.pcf")), .module_folder = entry.path().string()});

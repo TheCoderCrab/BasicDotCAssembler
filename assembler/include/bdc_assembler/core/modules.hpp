@@ -6,7 +6,11 @@
 #include <vector>
 #include <map>
 
-#define MODULES_DIR "modules/"
+#ifdef __linux__
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#endif /* __linux__ */
 
 struct module
 {
