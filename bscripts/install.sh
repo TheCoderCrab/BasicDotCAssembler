@@ -12,7 +12,7 @@ echo -e "\e[1m\e[32mInstalling Basic DotC Assembler\e[0m\e[39m"
 
 if [ ${EUID:-$(id -u)} -eq 0 ]; then # Should be run as root
     mkdir -p $DC_INSTALL_DIR
-    cp dotcvm "$DC_INSTALL_DIR/bdca"
+    cp bdca "$DC_INSTALL_DIR/bdca"
     cp uninstall.sh "$DC_INSTALL_DIR/uninstall.sh"
     [ -f /usr/bin/bdca ] && rm /usr/bin/bdca
     ln -s "$DC_INSTALL_DIR/bdca" /usr/bin/bdca

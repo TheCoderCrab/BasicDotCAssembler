@@ -13,6 +13,6 @@ make
 export EXIT_CODE=$?
 
 mkdir -p run
-cp basic_dotc_assembler run/
+cp basic_dotc_assembler run/bdca
 
 exit $EXIT_CODE
