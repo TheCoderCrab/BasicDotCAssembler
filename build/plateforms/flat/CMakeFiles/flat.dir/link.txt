@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -g -shared -Wl,-soname,libflat.so -o libflat.so CMakeFiles/flat.dir/src/flat.cpp.o 
