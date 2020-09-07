@@ -229,8 +229,6 @@ std::vector<line_data> parse_file(const std::string& file)
                     arg.activated = true;
                 };
                 line_d.instruction = line_only_space.substr(0, line_only_space.find(' '));
-                std::transform(line_d.instruction.begin(), line_d.instruction.end(),
-                               line_d.instruction.begin(), ::toupper                );
                 if(line_only_space.find(',') == std::string::npos)
                 {
                     std::string arg = line_only_space.substr(line_only_space.find(' '), line_only_space.find(',') - line_only_space.find(' ') - 1);
@@ -319,6 +317,8 @@ std::vector<line_data> parse_file(const std::string& file)
                     adr += get_arg_size(line_d.args[0]) + get_arg_size(line_d.args[1]);
                 }
             }
+            std::transform(line_d.instruction.begin(), line_d.instruction.end(),
+                line_d.instruction.begin(), ::toupper                           );
             if(!line_d.instruction.starts_with("PUT"))
                 adr += 2;
         }
@@ -348,6 +348,8 @@ std::vector<line_data> parse_file(const std::string& file)
         replace_label(l.args[0]);
         replace_label(l.args[1]);
         DEBUG_M("Replacing instructions");
+        std::transform(l.instruction.begin(), l.instruction.end(),
+                       l.instruction.begin(), ::toupper                );
 #define ERR(n) { ERR_M("Instruction: " << l.instruction << " can only have " << n << " argument"); exit(EXIT_FAILURE); } do{}while(0)
 #define ADD0(s) else if(l.instruction == #s) { if(l.args[0].activated  ||  l.args[1].activated)ERR(0); l.instr = instruction_n::s; } // To add a generic instruction taking 0 arguments
 #define ADD1(s) else if(l.instruction == #s) { if(!l.args[0].activated ||  l.args[1].activated)ERR(0); l.instr = instruction_n::s; } // To add a generic instruction taking 1 arguments
