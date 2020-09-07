@@ -17,7 +17,6 @@ __export std::vector<char> module_get_raw_bytes(const std::vector<line_data>& v)
                 {
                     DEBUG_M("it is a register");
                     output.push_back((uint8_t) a.ivalue);
-                    return;
                 }
                 union
                 {
