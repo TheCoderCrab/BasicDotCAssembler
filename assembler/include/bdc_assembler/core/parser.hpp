@@ -64,25 +64,26 @@ enum instruction_n { NO_OP  = 0xFF,
 
 struct arg
 {
-    std::vector<std::string>    tokens             ;
-    std::string                 value              ;
-    std::string                 prefix             ;
-    bool                        activated = false  ;
-    bool                        reg                ;
-    bool                        mem                ;
-    uint                        size               ;
-    uint                        ivalue             ;
+    std::vector<std::string>    tokens              ;
+    std::string                 value               ;
+    std::string                 prefix              ;
+    bool                        activated  = false  ;
+    bool                        reg                 ;
+    bool                        mem                 ;
+    uint                        size                ;
+    uint                        ivalue              ;
 };
 
 struct line_data
 {
-    int             line_num        ;
-    std::string     line            ;
-    std::string     line_only_space ;
-    std::string     instruction     ;
-    instruction_n   instr           ;
-    uint8_t         arg_desc        ;
-    arg             args[2]         ;
+    bool            pseudo_ins = false  ;
+    int             line_num            ;
+    std::string     line                ;
+    std::string     line_only_space     ;
+    std::string     instruction         ;
+    instruction_n   instr               ;
+    uint8_t         arg_desc            ;
+    arg             args[2]             ;
 };
 
 

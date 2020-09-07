@@ -229,6 +229,8 @@ std::vector<line_data> parse_file(const std::string& file)
                     arg.activated = true;
                 };
                 line_d.instruction = line_only_space.substr(0, line_only_space.find(' '));
+                std::transform(line_d.instruction.begin(), line_d.instruction.end(),
+                               line_d.instruction.begin(), ::toupper                );
                 if(line_only_space.find(',') == std::string::npos)
                 {
                     std::string arg = line_only_space.substr(line_only_space.find(' '), line_only_space.find(',') - line_only_space.find(' ') - 1);
@@ -317,7 +319,8 @@ std::vector<line_data> parse_file(const std::string& file)
                     adr += get_arg_size(line_d.args[0]) + get_arg_size(line_d.args[1]);
                 }
             }
-            adr += 2;
+            if(!line_d.instruction.starts_with("PUT"))
+                adr += 2;
         }
         DEBUG_M("Instruction: " << line_d.instruction << ", at: " << adr -2);
         lines_data.push_back(line_d);
@@ -345,18 +348,48 @@ std::vector<line_data> parse_file(const std::string& file)
         replace_label(l.args[0]);
         replace_label(l.args[1]);
         DEBUG_M("Replacing instructions");
-        std::transform(l.instruction.begin(), l.instruction.end(), l.instruction.begin(), ::toupper);
 #define ERR(n) { ERR_M("Instruction: " << l.instruction << " can only have " << n << " argument"); exit(EXIT_FAILURE); } do{}while(0)
 #define ADD0(s) else if(l.instruction == #s) { if(l.args[0].activated  ||  l.args[1].activated)ERR(0); l.instr = instruction_n::s; } // To add a generic instruction taking 0 arguments
 #define ADD1(s) else if(l.instruction == #s) { if(!l.args[0].activated ||  l.args[1].activated)ERR(0); l.instr = instruction_n::s; } // To add a generic instruction taking 1 arguments
 #define ADD2(s) else if(l.instruction == #s) { if(!l.args[0].activated || !l.args[1].activated)ERR(0); l.instr = instruction_n::s; } // To add a generic instruction taking 2 arguments
-        if(l.instruction == "NO_OP")
+        if(l.instruction == "PUT_BYTE")
         {
-            if(l.args[0].activated || l.args[1].activated)
+            if(!l.args[0].activated ||  l.args[1].activated)
                 ERR(0);
-            l.instr = instruction_n::NO_OP;
+            if(l.args[0].mem || l.args[0].reg)
+            {
+                ERR_M("PUT_Byte only accepts literal integers, at line: " << l.line_num);
+                exit(EXIT_FAILURE);
+            }
+            l.args[0].size = 1;
+            l.pseudo_ins = true;
         }
-        ADD0(CPUINF)
+        else if(l.instruction == "PUT_WORD")
+        {
+            if(!l.args[0].activated ||  l.args[1].activated)
+                ERR(0);
+            if(l.args[0].mem || l.args[0].reg)
+            {
+                ERR_M("PUT_Byte only accepts literal integers, at line: " << l.line_num);
+                exit(EXIT_FAILURE);
+            }
+            l.args[0].size = 2;
+            l.pseudo_ins = true;
+        }
+        else if(l.instruction == "PUT_DWORD")
+        {
+            if(!l.args[0].activated ||  l.args[1].activated)
+                ERR(0);
+            if(l.args[0].mem || l.args[0].reg)
+            {
+                ERR_M("PUT_Byte only accepts literal integers, at line: " << l.line_num);
+                exit(EXIT_FAILURE);
+            }
+            l.args[0].size = 4;
+            l.pseudo_ins = true;
+        }
+        ADD0(NO_OP)
+        ADD1(CPUINF)
         ADD2(SET)
         else if(l.instruction == "PUSH")
         {
