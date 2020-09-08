@@ -321,6 +321,12 @@ std::vector<line_data> parse_file(const std::string& file)
                 line_d.instruction.begin(), ::toupper                           );
             if(!line_d.instruction.starts_with("PUT"))
                 adr += 2;
+            else if(line_d.instruction == "PUT_BYTE")
+                adr += 1;
+            else if(line_d.instruction == "PUT_WORD")
+                adr += 2;
+            else if(line_d.instruction == "PUT_DWORD")
+                adr += 4;
         }
         DEBUG_M("Instruction: " << line_d.instruction << ", at: " << adr -2);
         lines_data.push_back(line_d);
