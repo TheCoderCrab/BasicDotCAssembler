@@ -6,6 +6,8 @@ file(GLOB_RECURSE SRC_FILES "assembler/src/*.cpp")
 
 project(basic_dotc_assembler)
 
+configure_file("assembler/include/bdc_assembler/in/config.hpp.in" "hello.hpp")
+
 add_executable(basic_dotc_assembler ${SRC_FILES})
 
 if(DEBUG)
